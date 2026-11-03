@@ -22,7 +22,7 @@
     })();
   </script>
 </head>
-<body data-page="reader">
+<body data-page="reader" data-docs-base="docs/">
   <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="progress" id="progress" aria-hidden="true"></div>
 
@@ -83,24 +83,29 @@
       <div class="reader-head">
         <div>
           <h1 id="readerTitle">加载文档…</h1>
-          <div class="reader-meta"><span id="readerPath">docs/…</span><span>·</span><span>UTF-8 Markdown 原文</span></div>
+          <div class="reader-meta"><span id="readerPath">docs/…</span><span>·</span><span>浏览器实时渲染 Markdown</span></div>
         </div>
         <div class="reader-actions">
           <a class="btn btn--sm btn--ghost" href="docs.html">返回文档地图</a>
+          <button class="btn btn--sm btn--ghost" type="button" id="readerSourceToggle" aria-pressed="false">查看源码</button>
           <a class="btn btn--sm" id="readerRaw" href="#" download>下载 Markdown</a>
         </div>
       </div>
-      <div class="reader-body">
-        <pre id="readerContent" tabindex="0">正在读取 Markdown 原文…</pre>
+      <div class="reader-layout">
+        <nav class="reader-toc" id="readerToc" aria-label="本文目录" hidden></nav>
+        <div class="reader-body">
+          <article class="doc-prose" id="readerContent" tabindex="0">正在渲染文档…</article>
+          <pre class="doc-source" id="readerSource" tabindex="0" hidden></pre>
+        </div>
       </div>
-      <p class="reader-note">这里是浏览器读取到的 Markdown 源文，按 UTF-8 解码并以等宽文本显示。需要渲染后的排版时，请在仓库中阅读；文档索引见 <a href="docs.html">技术文档</a>。</p>
+      <p class="reader-note">正文由浏览器按 GitHub 风格实时渲染（marked 本地引入，无外部请求），代码块可一键复制，Mermaid 图表以源码块展示；切换「查看源码」可对照 Markdown 原文。文档索引见 <a href="docs.html">技术文档</a>。</p>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="container">
       <div class="footer-bottom">
-        <span>© 2026 utils-cli · ru。本页读取仓库 docs/ 下的 Markdown 原文，不复制、不改写内容。</span>
+        <span>© 2026 utils-cli · ru。本页在浏览器内渲染仓库 docs/ 下的 Markdown，不复制、不改写内容。</span>
         <span class="footer-keys"><a href="docs.html">文档地图</a><span>·</span><a href="index.html">返回首页</a></span>
       </div>
     </div>
@@ -126,6 +131,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="assets/js/data.js"></script>
+  <script src="assets/js/vendor/marked.umd.js"></script>
+  <script src="assets/js/markdown.js"></script>
   <script src="assets/js/site.js"></script>
 </body>
 </html>

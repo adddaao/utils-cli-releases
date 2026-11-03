@@ -229,6 +229,18 @@
     });
   });
 
+  /* 文档渲染页的代码块由 Markdown 渲染器动态生成，使用事件委托复制 */
+  document.addEventListener('click', function (event) {
+    var trigger = event.target && event.target.closest ? event.target.closest('[data-copy-code]') : null;
+    if (!trigger) return;
+    var block = trigger.closest('.doc-code');
+    var code = block ? block.querySelector('code') : null;
+    if (!code) return;
+    copyText(code.textContent).then(function (ok) {
+      toast(ok ? '代码已复制' : '复制失败，请手动选择');
+    });
+  });
+
   /* ---------------- 截图查看 ---------------- */
   var lightbox = $('#lightbox');
   function setupLightbox() {
@@ -479,7 +491,7 @@
     if (!host) return;
     var groups = docs.groups || [];
     if (!groups.length) {
-      host.innerHTML = '<p class="muted">文档数据加载失败，请直接访问 <a href="docs/README.md">docs/README.md</a>。</p>';
+      host.innerHTML = '<p class="muted">文档数据加载失败，请直接访问 <a href="../docs/README.md">docs/README.md</a>。</p>';
       return;
     }
     host.innerHTML = groups
@@ -733,41 +745,202 @@
     var params = new URLSearchParams(location.search);
     var file = params.get('file') || '';
     var contentEl = $('#readerContent');
+    var sourceEl = $('#readerSource');
+    var tocEl = $('#readerToc');
     var titleEl = $('#readerTitle');
     var pathEl = $('#readerPath');
     var crumbEl = $('#readerCrumb');
     var rawLink = $('#readerRaw');
+    var sourceToggle = $('#readerSourceToggle');
     if (!contentEl) return;
-    var allowed = (docs.groups || []).reduce(function (list, group) {
-      return list.concat(group.docs.map(function (doc) { return doc.file; }));
-    }, []);
-    if (file !== 'README.md' && allowed.indexOf(file) === -1) {
+
+    var docsBase = document.body.getAttribute('data-docs-base') || '../docs/';
+    if (docsBase.charAt(docsBase.length - 1) !== '/') docsBase += '/';
+    var markdown = window.RUMarkdown;
+
+    function docHref(target) {
+      if (markdown && markdown.docUrl) return markdown.docUrl(docsBase, target);
+      return docsBase + String(target).split('/').map(encodeURIComponent).join('/');
+    }
+
+    var normalized = String(file).replace(/\\/g, '/');
+    var segments = normalized.split('/');
+    /* 只允许读取 docs/ 目录下的 Markdown：拒绝绝对路径与目录穿越 */
+    var valid = /\.md$/i.test(normalized) && normalized.charAt(0) !== '/' &&
+      segments.every(function (part) {
+        return part && part !== '.' && part !== '..';
+      });
+    if (!valid) {
+      document.title = '文档不存在 · ru';
       titleEl.textContent = '文档不存在';
+      pathEl.textContent = 'docs/…';
       contentEl.textContent = '没有找到要打开的文档。请返回文档地图重新选择。';
+      sourceEl.hidden = true;
+      if (sourceToggle) sourceToggle.hidden = true;
       return;
     }
+
     var doc = null;
     (docs.groups || []).forEach(function (group) {
       group.docs.forEach(function (item) {
-        if (item.file === file) doc = item;
+        if (item.file === normalized) doc = item;
       });
     });
-    var title = doc ? doc.title : '文档索引';
+    var title = doc ? doc.title : normalized.replace(/\.md$/i, '').split('/').pop();
     document.title = title + ' · ru 文档';
     titleEl.textContent = title;
-    pathEl.textContent = 'docs/' + file;
-    crumbEl.textContent = file.split('/').pop();
-    if (rawLink) rawLink.href = 'docs/' + file;
-    fetch('docs/' + file, { cache: 'no-store' })
+    pathEl.textContent = 'docs/' + normalized;
+    crumbEl.textContent = normalized.split('/').pop();
+    if (rawLink) {
+      rawLink.href = docHref(normalized);
+      rawLink.setAttribute('download', normalized.split('/').pop());
+    }
+
+    var currentDir = normalized.split('/').slice(0, -1).join('/');
+    var loaded = false;
+    var sourceMode = false;
+    var tocItems = [];
+    var tocLinks = [];
+    var tocHeadingEls = [];
+    var tocActiveIndex = -1;
+    var scrollScheduled = false;
+
+    function setTocVisible(visible) {
+      if (!tocEl) return;
+      tocEl.hidden = !(visible && tocItems.length >= 3);
+    }
+
+    function setActiveToc(index) {
+      if (index === tocActiveIndex) return;
+      tocActiveIndex = index;
+      tocLinks.forEach(function (link, i) {
+        link.classList.toggle('is-active', i === index);
+      });
+    }
+
+    function updateTocActive() {
+      if (!tocItems.length || sourceMode) return;
+      var current = -1;
+      for (var i = 0; i < tocHeadingEls.length; i += 1) {
+        var heading = tocHeadingEls[i];
+        if (!heading) continue;
+        if (heading.getBoundingClientRect().top <= 120) current = i;
+        else break;
+      }
+      setActiveToc(current);
+    }
+
+    function onScrollForToc() {
+      if (scrollScheduled) return;
+      scrollScheduled = true;
+      requestAnimationFrame(function () {
+        scrollScheduled = false;
+        updateTocActive();
+      });
+    }
+    window.addEventListener('scroll', onScrollForToc, { passive: true });
+
+    function renderToc(headings) {
+      tocItems = (headings || []).filter(function (item) {
+        return item.depth >= 2 && item.depth <= 3;
+      });
+      tocLinks = [];
+      tocHeadingEls = [];
+      tocActiveIndex = -1;
+      if (!tocEl || tocItems.length < 3) {
+        setTocVisible(false);
+        return;
+      }
+      var html = '<div class="reader-toc__title">本文目录</div><ol class="reader-toc__list">';
+      tocItems.forEach(function (item) {
+        html += '<li class="reader-toc__item reader-toc__item--h' + item.depth + '">' +
+          '<a href="#' + encodeURIComponent(item.id) + '">' + escapeHtml(item.text) + '</a></li>';
+      });
+      html += '</ol>';
+      tocEl.innerHTML = html;
+      tocLinks = $$('a', tocEl);
+      tocHeadingEls = tocItems.map(function (item) {
+        return document.getElementById(item.id);
+      });
+      setTocVisible(true);
+      updateTocActive();
+    }
+
+    function setSourceMode(enabled) {
+      sourceMode = enabled;
+      contentEl.hidden = enabled;
+      sourceEl.hidden = !enabled;
+      setTocVisible(!enabled);
+      if (sourceToggle) {
+        sourceToggle.textContent = enabled ? '查看渲染' : '查看源码';
+        sourceToggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+      }
+      if (enabled) {
+        sourceEl.scrollTop = 0;
+      } else {
+        requestAnimationFrame(updateTocActive);
+      }
+    }
+
+    if (sourceToggle) {
+      sourceToggle.addEventListener('click', function () {
+        if (!loaded) {
+          toast('文档仍在加载…');
+          return;
+        }
+        setSourceMode(!sourceMode);
+      });
+    }
+
+    fetch(docHref(normalized), { cache: 'no-store' })
       .then(function (response) {
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return response.text();
       })
       .then(function (text) {
-        contentEl.textContent = text;
+        sourceEl.textContent = text;
+        loaded = true;
+        if (!markdown) {
+          setSourceMode(true);
+          if (sourceToggle) sourceToggle.hidden = true;
+          return;
+        }
+        var result = markdown.render(text, {
+          resolveHref: function (href) {
+            return markdown.resolveDocHref(href, currentDir, docsBase);
+          }
+        });
+        contentEl.innerHTML = result.html;
+        renderToc(result.headings);
+        if (!doc) {
+          var firstHeading = contentEl.querySelector('h1, h2');
+          if (firstHeading) {
+            var headingText = firstHeading.textContent.replace(/#\s*$/, '').trim();
+            if (headingText) {
+              title = headingText;
+              document.title = title + ' · ru 文档';
+              titleEl.textContent = title;
+            }
+          }
+        }
+        if (location.hash) {
+          var targetId = decodeURIComponent(location.hash.slice(1));
+          var target = document.getElementById(targetId);
+          if (target) {
+            requestAnimationFrame(function () {
+              target.scrollIntoView();
+            });
+          }
+        }
+        updateTocActive();
       })
       .catch(function () {
-        contentEl.textContent = '无法读取 Markdown 原文。请确认预览服务器从仓库根目录启动，或直接使用右上角的「打开原始文件」。';
+        titleEl.textContent = doc ? doc.title : '文档读取失败';
+        contentEl.textContent = '无法读取 Markdown 原文。请确认预览服务器从仓库根目录启动，或直接使用右上角的「下载 Markdown」。';
+        sourceEl.textContent = '';
+        sourceEl.hidden = true;
+        setTocVisible(false);
+        if (sourceToggle) sourceToggle.hidden = true;
       });
   }
 

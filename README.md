@@ -8,7 +8,7 @@
 
 ## 本地预览
 
-站点需要和仓库 `docs/` 在同一台静态服务器下，文档阅读页才能读取 Markdown 原文。请在**仓库根目录**启动服务：
+站点需要和仓库 `docs/` 在同一台静态服务器下，文档阅读页才能实时读取并渲染 Markdown。请在**仓库根目录**启动服务：
 
 ```bash
 cd utils-cli
@@ -24,9 +24,13 @@ python3 -m http.server 4173
 | --- | --- |
 | `index.html` | 首页：Hero TUI 预览、8 个功能模块、工作方式、真实界面截图、CLI、安装、平台矩阵、文档与 CTA |
 | `docs.html` | 技术文档索引：4 个分组、52 篇文档，支持标题/简介/文件名筛选与分组定位 |
-| `doc.html` | 文档阅读页：按 `file` 参数读取 `docs/` 下的 Markdown 原文，按 UTF-8 解码展示 |
+| `doc.html` | 文档阅读页：按 `file` 参数读取 `docs/` 下的 Markdown，在浏览器内渲染排版，支持本页目录、代码复制、源码切换与下载 |
 | `assets/js/data.js` | 文档索引数据（标题、简介、文件路径、分组） |
-| `assets/js/site.js` | 主题、TUI 预览切换、CLI/安装标签、命令面板、复制、截图查看与文档筛选 |
+| `assets/js/site.js` | 主题、TUI 预览切换、CLI/安装标签、命令面板、复制、截图查看、文档筛选与阅读页交互 |
+| `assets/js/markdown.js` | 阅读页渲染适配：标题锚点、文档间链接改写、代码块工具条、表格滚动容器、HTML 转义 |
+| `assets/js/vendor/marked.umd.js` | 本地引入的 [marked](https://github.com/markedjs/marked) v18.1.3（MIT），许可证见 `assets/js/vendor/marked.LICENSE` |
+| `tests/markdown.test.mjs` | 渲染回归：基础语法、全量 `docs/` 的标题/代码块/表格数量与文档链接锚点校验 |
+| `publish-gh-pages.sh` | 把站点文件发布到 `adddaao/utils-cli-releases` 的 `gh-pages` 分支 |
 
 ## 交互
 
@@ -37,7 +41,7 @@ python3 -m http.server 4173
 - **命令面板**：`⌘K` / `Ctrl+K` 搜索页面、模块、命令与 52 篇文档；`/` 在文档页聚焦筛选框。
 - **截图查看**：点击 TUI 截图打开大图查看器（`Esc` 关闭）。
 - **文档索引**：按关键字过滤文档卡片，侧栏随滚动高亮分组，支持 `docs.html#group-*` 深链。
-- **文档阅读**：从索引进入 `doc.html?file=...`，浏览器读取并展示 Markdown 源文，可下载原文。
+- **文档阅读**：从索引进入 `doc.html?file=...`，浏览器抓取 Markdown 后按 GitHub 风格渲染；右侧（窄屏为正文上方）显示本页目录，代码块可一键复制，`查看源码` 可对照原文，也可下载 Markdown。文档内的 `.md` 链接会改写为阅读页链接，外部链接新窗口打开。
 
 ## 内容来源
 
@@ -48,12 +52,32 @@ python3 -m http.server 4173
 
 ## 技术说明
 
-- 纯静态 HTML/CSS/JavaScript，无构建步骤、无前端框架、无 CDN。
+- 纯静态 HTML/CSS/JavaScript，无构建步骤、无前端框架、无 CDN；Markdown 渲染器随站点本地分发，运行时不请求任何第三方资源。
 - 字体为本地 IBM Plex Sans / IBM Plex Mono，SIL OFL 1.1，许可证见 `assets/fonts/licenses/`。
 - 站点不收集数据、不请求第三方资源；GitHub Releases 与文档下载是显式外链。
-- 文档阅读页依赖同源 `fetch('../docs/...')`，因此建议通过本地 HTTP 服务预览。
+- 文档阅读页依赖同源 `fetch(docsBase + file)`；本地为仓库根目录服务时的 `../docs/`，发布到 `gh-pages` 根目录时为 `docs/`，由 `<body data-docs-base>` 指定。
+- Mermaid 代码块按源码块展示，不加载 Mermaid 运行时；如需图形化，请在仓库或支持 Mermaid 的编辑器里查看。
+
+## 测试
+
+```bash
+node --test showcase/tests/markdown.test.mjs
+```
+
+测试会加载真实的 `marked.umd.js` 与 `markdown.js`，渲染仓库 `docs/` 下全部 Markdown，并校验标题/代码块/表格数量、标题锚点唯一性、文档间链接与跨文档锚点。仓库里已存在的失效链接单独登记在 `KNOWN_BROKEN_LINKS`，不参与渲染回归判定。
+
+## 发布
+
+```bash
+# 需要已通过 gh 登录 adddaao 账号（repo 权限）
+./showcase/publish-gh-pages.sh
+```
+
+脚本会克隆 `adddaao/utils-cli-releases` 的 `gh-pages` 分支到临时目录，只同步站点自身文件（`index.html`、`docs.html`、`doc.html`、`preview.jpg`、`README.md`、`assets/`），保留线上已有的 `docs/` 快照、`.nojekyll` 与 `.gitignore`；随后把 `doc.html` 的 `data-docs-base` 从 `../docs/` 改写为 `docs/`，提交并推送。临时目录用 `trash` 回收。
 
 ## 维护提示
 
 - 版本号、模块数量、文档数量与截图说明在 `index.html`、`docs.html`、`doc.html` 和 `assets/js/data.js` 中；更新文档清单时同步修改 `data.js` 与索引页的分组计数。
-- 文档阅读页只展示 Markdown 源文，不做 Markdown 渲染；如需正式文档站，请以 `docs/README.md` 为入口继续扩展。
+- 升级 Markdown 渲染器时替换 `assets/js/vendor/marked.umd.js` 与许可证，并同步运行渲染测试；`markdown.js` 只依赖 `marked` 的 `Marked` / `Renderer` 接口。
+- 文档阅读页只读取 `docs/` 目录，拒绝绝对路径与 `..`；其目录、复制与源码切换逻辑都在 `site.js` 的 `setupReader` 中。
+- 新增或调整阅读页样式时同时检查深色、浅色、窄屏和打印四个场景。
