@@ -122,7 +122,6 @@
     });
     navItems.forEach(function (item) {
       var view = item.getAttribute('data-nav-for');
-      if (['docker', 'backup', 'deploy', 'doctor'].indexOf(view) === -1) return;
       item.setAttribute('role', 'button');
       item.setAttribute('tabindex', '0');
       item.addEventListener('click', function () {

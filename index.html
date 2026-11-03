@@ -117,9 +117,13 @@
           <div class="hero-visual">
             <div class="tui-switch" role="tablist" aria-label="TUI 预览视图">
               <button type="button" role="tab" data-tui-view="docker" aria-selected="true">Docker</button>
-              <button type="button" role="tab" data-tui-view="backup" aria-selected="false">数据库备份</button>
-              <button type="button" role="tab" data-tui-view="deploy" aria-selected="false">AIOps 部署</button>
-              <button type="button" role="tab" data-tui-view="doctor" aria-selected="false">环境诊断</button>
+              <button type="button" role="tab" data-tui-view="clean" aria-selected="false">清理</button>
+              <button type="button" role="tab" data-tui-view="find" aria-selected="false">Find</button>
+              <button type="button" role="tab" data-tui-view="backup" aria-selected="false">数据库</button>
+              <button type="button" role="tab" data-tui-view="deploy" aria-selected="false">部署</button>
+              <button type="button" role="tab" data-tui-view="firewall" aria-selected="false">防火墙</button>
+              <button type="button" role="tab" data-tui-view="export" aria-selected="false">文件中转</button>
+              <button type="button" role="tab" data-tui-view="doctor" aria-selected="false">诊断</button>
             </div>
             <div class="term-window" aria-label="ru 全屏 TUI 预览">
               <div class="term-bar">
@@ -161,6 +165,43 @@
                       <div class="tui-empty-space"></div>
                       <div class="tui-help"><b>数字</b> 定位<span class="sep">·</span><b>Space</b> 选择/标签<span class="sep">·</span><b>r a</b> 全选<span class="sep">·</span><b>Enter</b> 导出<span class="sep">·</span><b>S</b> 排序<span class="sep">·</span><b>i</b> 详情<span class="sep">·</span><b>d d</b> 删除</div>
                     </div>
+                    <!-- 清理工具 -->
+                    <div data-tui-panel="clean" hidden>
+                      <div class="tui-crumb"><span>清理工具</span><span class="sep">›</span><span>扫描结果</span><span class="sep">›</span><span class="current">待清理项</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">清理扫描</div>
+                      <div class="tui-subrow"><b>/</b> 搜索路径 <span style="margin-left:auto">预计释放 3.6GB</span></div>
+                      <div class="tui-table tui-cols-clean">
+                        <div class="tui-tr tui-tr--head"><span></span><span>类型</span><span>路径</span><span>大小</span><span>状态</span></div>
+                        <div class="tui-tr is-selected"><span>[x]</span><span class="dim">Maven</span><span>~/.m2/repository</span><span>1.8GB</span><span class="ok">可清理</span></div>
+                        <div class="tui-tr"><span>[x]</span><span class="dim">缓存</span><span>~/Library/Caches/Homebrew</span><span>742MB</span><span class="ok">可清理</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span class="dim">临时文件</span><span>/tmp/ru-*</span><span>126MB</span><span class="ok">可清理</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span class="dim">压缩包</span><span>~/Downloads/*.zip</span><span>934MB</span><span class="warn">需确认</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span class="dim">日志</span><span>~/.local/share/ru/logs</span><span>64MB</span><span class="dim">保留</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>Space</b> 选择<span class="sep">·</span><b>r a</b> 全选<span class="sep">·</span><b>Enter</b> 清理<span class="sep">·</span><b>i</b> 明细<span class="sep">·</span><b>l</b> 日志<span class="sep">·</span><b>Esc</b> 返回<span class="sep">·</span>删除进入废纸篓</div>
+                    </div>
+                    <!-- Find 文件查找 -->
+                    <div data-tui-panel="find" hidden>
+                      <div class="tui-crumb"><span>Find 文件查找</span><span class="sep">›</span><span>条件构建</span><span class="sep">›</span><span class="current">搜索结果</span><span class="tui-focus">焦点: 条件</span></div>
+                      <div class="tui-title">查找条件</div>
+                      <div class="tui-subrow"><b>/</b> 搜索字段 <span style="margin-left:auto">预计匹配 12 个文件</span></div>
+                      <div class="tui-table tui-cols-find">
+                        <div class="tui-tr tui-tr--head"><span>字段</span><span>操作</span><span>值</span></div>
+                        <div class="tui-tr is-selected"><span>名称</span><span>like</span><span>*.log</span></div>
+                        <div class="tui-tr"><span>大小</span><span>&gt;</span><span>10MB</span></div>
+                        <div class="tui-tr"><span>修改时间</span><span>&lt;</span><span>30 天</span></div>
+                        <div class="tui-tr"><span>路径</span><span>=</span><span>~/projects</span></div>
+                      </div>
+                      <div class="tui-subrow" style="margin-top:7px"><b>结果</b> 12 个文件 · 总计 2.1GB</div>
+                      <div class="tui-table tui-cols-files">
+                        <div class="tui-tr tui-tr--head"><span>文件</span><span>大小</span><span>修改时间</span></div>
+                        <div class="tui-tr"><span>~/projects/api/logs/app.log</span><span>18MB</span><span>2 天前</span></div>
+                        <div class="tui-tr"><span>~/projects/web/logs/access.log</span><span>64MB</span><span>3 天前</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>a</b> 新增条件<span class="sep">·</span><b>Enter</b> 编辑<span class="sep">·</span><b>r x</b> 完成<span class="sep">·</span><b>d d</b> 删除<span class="sep">·</span><b>m</b> 移动<span class="sep">·</span><b>Esc</b> 返回</div>
+                    </div>
                     <!-- 数据库备份 -->
                     <div data-tui-panel="backup" hidden>
                       <div class="tui-crumb"><span>数据库管理</span><span class="sep">›</span><span>备份计划</span><span class="sep">›</span><span class="current">计划详情</span><span class="tui-focus">焦点: 内容</span></div>
@@ -190,6 +231,38 @@
                       <div class="tui-empty-space"></div>
                       <div class="tui-help"><b>Enter</b> 查看详情<span class="sep">·</span><b>i</b> 巡检<span class="sep">·</span><b>r</b> 刷新<span class="sep">·</span><b>d</b> 部署<span class="sep">·</span><b>Esc/q</b> 返回</div>
                     </div>
+                    <!-- 防火墙 -->
+                    <div data-tui-panel="firewall" hidden>
+                      <div class="tui-crumb"><span>防火墙</span><span class="sep">›</span><span>入站规则</span><span class="sep">›</span><span class="current">规则列表</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">TCP 入站规则</div>
+                      <div class="tui-subrow">后端 <b>ufw</b> <span style="margin-left:auto">Linux 示例</span></div>
+                      <div class="tui-table tui-cols-firewall">
+                        <div class="tui-tr tui-tr--head"><span>端口</span><span>协议</span><span>来源</span><span>状态</span></div>
+                        <div class="tui-tr is-selected"><span>22</span><span>tcp</span><span>任意</span><span class="ok">放行</span></div>
+                        <div class="tui-tr"><span>443</span><span>tcp</span><span>任意</span><span class="ok">放行</span></div>
+                        <div class="tui-tr"><span>5432</span><span>tcp</span><span>10.0.0.0/24</span><span class="ok">放行</span></div>
+                        <div class="tui-tr"><span>8080</span><span>tcp</span><span>任意</span><span class="dim">未放行</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>a</b> 放行端口<span class="sep">·</span><b>d d</b> 撤销规则<span class="sep">·</span><b>Enter</b> 详情<span class="sep">·</span><b>r</b> 刷新<span class="sep">·</span><b>Esc</b> 返回</div>
+                    </div>
+                    <!-- 文件中转 -->
+                    <div data-tui-panel="export" hidden>
+                      <div class="tui-crumb"><span>文件中转</span><span class="sep">›</span><span>预检</span><span class="sep">›</span><span class="current">导出</span><span class="tui-focus">焦点: 表单</span></div>
+                      <div class="tui-title">文件中转</div>
+                      <div class="tui-subrow">SUDO_USER <b>deploy</b> <span style="margin-left:auto">仅原生 Linux · root 会话</span></div>
+                      <div class="tui-table tui-cols-export">
+                        <div class="tui-tr tui-tr--head"><span>项目</span><span>值</span></div>
+                        <div class="tui-tr is-selected"><span>源路径</span><span>/var/log/nginx/access.log</span></div>
+                        <div class="tui-tr"><span>目标目录</span><span>/home/deploy/xftp</span></div>
+                        <div class="tui-tr"><span>目标文件</span><span>nginx-access.log</span></div>
+                        <div class="tui-tr"><span>方式</span><span>复制</span></div>
+                        <div class="tui-tr"><span>权限</span><span>root → deploy</span></div>
+                      </div>
+                      <div class="tui-note-line">移动模式会在复制并复核后，把源路径移入废纸篓。</div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>Enter</b> 开始导出<span class="sep">·</span><b>Space</b> 切换复制/移动<span class="sep">·</span><b>r</b> 重新预检<span class="sep">·</span><b>Esc</b> 返回</div>
+                    </div>
                     <!-- 诊断 -->
                     <div data-tui-panel="doctor" hidden>
                       <div class="tui-crumb"><span>工具</span><span class="sep">›</span><span>环境诊断</span><span class="sep">›</span><span class="current">检查结果</span><span class="tui-focus">焦点: 内容</span></div>
@@ -212,6 +285,7 @@
                 <div class="tui-help"><b>↑↓/j/k</b> 定位<span class="sep">·</span><b>Enter</b> 进入<span class="sep">·</span><b>/</b> 搜索<span class="sep">·</span><b>F4</b> 功能搜索<span class="sep">·</span><b>Tab</b> 焦点<span class="sep">·</span><b>Esc/q</b> 返回<span class="sep">·</span><b>r q</b> 导航栏<span class="sep">·</span><b>Ctrl+C</b> 退出</div>
               </div>
             </div>
+            <p class="tui-caption">点击标签或左侧模块，预览八个功能界面</p>
             <span class="float-chip float-chip--a"><span class="pulse"></span><b>Go SDK</b> 直连 Docker</span>
           </div>
         </div>

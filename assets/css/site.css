@@ -973,6 +973,12 @@ html[data-theme="light"] .icon-btn .icon-moon {
   flex-direction: column;
   min-height: 0;
 }
+.tui-main > [data-tui-panel] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 280px;
+}
 .tui-crumb {
   display: flex;
   flex-wrap: wrap;
@@ -1073,6 +1079,27 @@ html[data-theme="light"] .icon-btn .icon-moon {
 .tui-cols-doctor .tui-tr {
   grid-template-columns: minmax(0, 0.8fr) 52px minmax(0, 1.2fr);
 }
+.tui-cols-clean .tui-tr {
+  grid-template-columns: 12px 52px minmax(0, 1.35fr) 44px 52px;
+}
+.tui-cols-find .tui-tr {
+  grid-template-columns: 66px 48px minmax(0, 1fr);
+}
+.tui-cols-files .tui-tr {
+  grid-template-columns: minmax(0, 1fr) 48px 46px;
+}
+.tui-cols-firewall .tui-tr {
+  grid-template-columns: 40px 34px minmax(0, 1fr) 48px;
+}
+.tui-cols-export .tui-tr {
+  grid-template-columns: 70px minmax(0, 1fr);
+}
+.tui-note-line {
+  margin-top: 7px;
+  color: var(--term-dim);
+  font-size: 8.6px;
+  line-height: 1.6;
+}
 .tui-empty-space {
   flex: 1;
   min-height: 18px;
@@ -1091,6 +1118,13 @@ html[data-theme="light"] .icon-btn .icon-moon {
 .tui-help .sep {
   margin: 0 4px;
   color: var(--term-line);
+}
+.tui-caption {
+  margin: 7px 2px 0;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  text-align: right;
 }
 .float-chip {
   position: absolute;
@@ -3081,6 +3115,24 @@ html[data-theme="light"] .icon-btn .icon-moon {
   }
   .tui-cols-doctor .tui-tr {
     grid-template-columns: minmax(0, 0.8fr) 42px minmax(0, 1.1fr) !important;
+  }
+  .tui-cols-clean .tui-tr {
+    grid-template-columns: 12px 42px minmax(0, 1.2fr) 38px 44px !important;
+  }
+  .tui-cols-find .tui-tr {
+    grid-template-columns: 52px 38px minmax(0, 1fr) !important;
+  }
+  .tui-cols-files .tui-tr {
+    grid-template-columns: minmax(0, 1fr) 38px 36px !important;
+  }
+  .tui-cols-firewall .tui-tr {
+    grid-template-columns: 32px 28px minmax(0, 1fr) 40px !important;
+  }
+  .tui-cols-export .tui-tr {
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+  }
+  .tui-caption {
+    text-align: left;
   }
   .footer-top {
     grid-template-columns: minmax(0, 1fr);
