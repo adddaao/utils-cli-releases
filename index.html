@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ru · utils-cli 本地系统管理工作台</title>
+  <meta name="description" content="ru 是面向开发与运维的本地系统管理工作台：Docker、清理、文件查找、数据库备份、防火墙、AIOps 部署与诊断，共用一套全屏 TUI 与可脚本化的子命令。">
+  <meta name="theme-color" content="#06070a">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ru · 本地系统管理工作台">
+  <meta property="og:description" content="面向开发与运维的本地系统管理工作台：Docker、清理、文件查找、数据库备份、防火墙、AIOps 部署与诊断，共用一套全屏 TUI 与可脚本化的子命令。">
+  <meta property="og:image" content="preview.jpg">
+  <meta property="og:locale" content="zh_CN">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/ibm-plex-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      try {
+        var saved = localStorage.getItem('ru-showcase:theme');
+        root.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+      } catch (e) {
+        root.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ===================== 顶栏 ===================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="ru 展示站首页">
+        <img class="brand__mark" src="assets/img/favicon.svg" alt="" width="27" height="27">
+        <span class="brand__word">ru</span>
+        <span class="brand__tag">utils-cli</span>
+        <span class="brand__ver">v0.3.2 preview</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#modules">模块</a>
+        <a href="#screens">界面</a>
+        <a href="#cli">命令</a>
+        <a href="docs.html">文档</a>
+        <a href="#install">安装</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" type="button" data-open-palette aria-label="搜索站内内容">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path></svg>
+          <span>搜索</span>
+          <kbd>⌘K</kbd>
+        </button>
+        <button class="icon-btn" type="button" id="themeToggle" aria-label="切换深浅色" title="切换深浅色">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.2A8.4 8.4 0 0 1 9.8 3.6 8.5 8.5 0 1 0 20.4 14.2Z"></path></svg>
+        </button>
+        <a class="icon-btn" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener noreferrer" aria-label="GitHub Releases" title="GitHub Releases">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.36-3.36-1.36-.45-1.18-1.1-1.49-1.1-1.49-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.88 1.54 2.3 1.1 2.86.84.09-.65.35-1.1.63-1.35-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.7.12 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.93.68 1.87v2.77c0 .26.18.58.69.48A10.02 10.02 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z"></path></svg>
+        </a>
+        <button class="icon-btn nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="mobilePanel" aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-panel" id="mobilePanel" aria-label="移动端菜单">
+    <div class="mobile-panel__links">
+      <a href="#modules">功能模块</a>
+      <a href="#screens">界面截图</a>
+      <a href="#cli">命令行</a>
+      <a href="docs.html">技术文档</a>
+      <a href="#install">安装</a>
+      <a href="#platform">平台支持</a>
+    </div>
+    <div class="mobile-panel__actions">
+      <a class="btn btn--sm" href="#install">立即安装</a>
+      <a class="btn btn--sm btn--ghost" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>
+    </div>
+    <p class="mobile-panel__help">快捷键：⌘K / Ctrl+K 搜索，t 切换明暗，Esc 关闭浮层。</p>
+  </div>
+
+  <main id="main">
+    <!-- ===================== Hero ===================== -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="hero-badge">
+              <span class="hero-badge__tag">v0.3.2 preview.12</span>
+              <span>2026-10-26</span>
+              <span class="hero-badge__sep" aria-hidden="true"></span>
+              <span>Linux · macOS · Windows</span>
+            </span>
+            <h1>把日常运维，<br>收进一个<em>终端</em><span class="cursor" aria-hidden="true"></span></h1>
+            <p class="hero-lead">ru（utils-cli）是面向开发与运维的本地系统管理工作台。Docker、清理、文件查找、数据库备份、防火墙、AIOps 部署与诊断，<strong>共用一套全屏 TUI 和可脚本化的子命令</strong>。</p>
+            <div class="hero-cta">
+              <a class="btn" href="#install">
+                立即安装
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"></path></svg>
+              </a>
+              <a class="btn btn--ghost" href="docs.html">
+                阅读技术文档
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 0 0 4 20.5V6.5Z"></path><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20"></path></svg>
+              </a>
+            </div>
+            <div class="hero-meta">
+              <span class="chip">单二进制发布</span>
+              <span class="chip">TUI 与 CLI 同源</span>
+              <span class="chip">删除走废纸篓</span>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="tui-switch" role="tablist" aria-label="TUI 预览视图">
+              <button type="button" role="tab" data-tui-view="docker" aria-selected="true">Docker</button>
+              <button type="button" role="tab" data-tui-view="backup" aria-selected="false">数据库备份</button>
+              <button type="button" role="tab" data-tui-view="deploy" aria-selected="false">AIOps 部署</button>
+              <button type="button" role="tab" data-tui-view="doctor" aria-selected="false">环境诊断</button>
+            </div>
+            <div class="term-window" aria-label="ru 全屏 TUI 预览">
+              <div class="term-bar">
+                <span class="win-dots"><i></i><i></i><i></i></span>
+                <span class="term-bar__title">ru — 本地系统管理工作台</span>
+                <span class="term-bar__meta">TUI</span>
+              </div>
+              <div class="term-body">
+                <div class="tui-grid">
+                  <div class="tui-panel tui-nav">
+                    <div class="tui-panel__label"><b>ru</b><span>模块</span></div>
+                    <div class="tui-nav-list">
+                      <div class="tui-nav-item is-active" data-nav-for="docker"><span class="idx">[1]</span> Docker 管理</div>
+                      <div class="tui-nav-item" data-nav-for="clean"><span class="idx">[2]</span> 清理工具</div>
+                      <div class="tui-nav-item" data-nav-for="find"><span class="idx">[3]</span> Find 文件查找</div>
+                      <div class="tui-nav-item" data-nav-for="backup"><span class="idx">[4]</span> 数据库管理</div>
+                      <div class="tui-nav-item" data-nav-for="deploy"><span class="idx">[5]</span> 部署</div>
+                      <div class="tui-nav-item" data-nav-for="firewall"><span class="idx">[6]</span> 防火墙</div>
+                      <div class="tui-nav-item" data-nav-for="export"><span class="idx">[7]</span> 文件中转</div>
+                      <div class="tui-nav-item" data-nav-for="doctor"><span class="idx">[8]</span> 工具与诊断</div>
+                    </div>
+                  </div>
+                  <div class="tui-panel tui-main">
+                    <!-- Docker -->
+                    <div data-tui-panel="docker">
+                      <div class="tui-crumb"><span>Docker 管理</span><span class="sep">›</span><span>镜像管理</span><span class="sep">›</span><span class="current">镜像列表</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">镜像列表</div>
+                      <div class="tui-subrow"><b>/</b> 搜索镜像名或标签 <span style="margin-left:auto">共 12 个镜像</span></div>
+                      <div class="tui-table tui-cols-images">
+                        <div class="tui-tr tui-tr--head"><span></span><span>#</span><span>镜像名</span><span>标签</span><span>大小</span><span>使用中</span></div>
+                        <div class="tui-tr is-selected"><span>[x]</span><span>1</span><span>registry.example.com/team/api</span><span class="tag">latest</span><span>1.63GB</span><span>是</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>2</span><span>nginx</span><span>stable</span><span>187MB</span><span>是</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>3</span><span>redis</span><span>7.4-alpine</span><span>41MB</span><span>否</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>4</span><span>postgres</span><span>17</span><span>432MB</span><span>是</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>5</span><span>caddy</span><span>2.10</span><span>52MB</span><span>否</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>6</span><span>pgvector/pgvector</span><span>pg17</span><span>428MB</span><span>否</span></div>
+                        <div class="tui-tr"><span>[ ]</span><span>7</span><span>alpine</span><span>latest</span><span>8.8MB</span><span>否</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>数字</b> 定位<span class="sep">·</span><b>Space</b> 选择/标签<span class="sep">·</span><b>r a</b> 全选<span class="sep">·</span><b>Enter</b> 导出<span class="sep">·</span><b>S</b> 排序<span class="sep">·</span><b>i</b> 详情<span class="sep">·</span><b>d d</b> 删除</div>
+                    </div>
+                    <!-- 数据库备份 -->
+                    <div data-tui-panel="backup" hidden>
+                      <div class="tui-crumb"><span>数据库管理</span><span class="sep">›</span><span>备份计划</span><span class="sep">›</span><span class="current">计划详情</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">备份计划</div>
+                      <div class="tui-subrow"><b>/</b> 搜索计划名 <span style="margin-left:auto">保留策略已启用</span></div>
+                      <div class="tui-table tui-cols-backup">
+                        <div class="tui-tr tui-tr--head"><span>计划</span><span>最近备份</span><span>格式</span><span>大小</span><span>状态</span></div>
+                        <div class="tui-tr is-selected"><span>生产库-每日全量</span><span>2 小时前</span><span>custom</span><span>1.2GB</span><span class="ok">成功</span></div>
+                        <div class="tui-tr"><span>订单库-每小时</span><span>18 分钟前</span><span>custom</span><span>186MB</span><span class="ok">成功</span></div>
+                        <div class="tui-tr"><span>报表库-每周</span><span>3 天前</span><span>plain</span><span>2.4GB</span><span class="warn">校验中</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>a</b> 新增计划<span class="sep">·</span><b>Enter</b> 编辑<span class="sep">·</span><b>r s</b> 保存<span class="sep">·</span><b>d d</b> 删除<span class="sep">·</span><b>i</b> 备份明细<span class="sep">·</span><b>r t</b> 预检</div>
+                    </div>
+                    <!-- AIOps -->
+                    <div data-tui-panel="deploy" hidden>
+                      <div class="tui-crumb"><span>部署</span><span class="sep">›</span><span>AIOps 部署</span><span class="sep">›</span><span class="current">服务器状态</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">服务器状态</div>
+                      <div class="tui-subrow"><b>/</b> 搜索服务器或项目 <span style="margin-left:auto">SSH · known_hosts 已校验</span></div>
+                      <div class="tui-table tui-cols-servers">
+                        <div class="tui-tr tui-tr--head"><span>服务器</span><span>项目</span><span>连接</span><span>状态</span></div>
+                        <div class="tui-tr is-selected"><span>生产-01</span><span>api</span><span>SSH</span><span class="ok">在线</span></div>
+                        <div class="tui-tr"><span>生产-02</span><span>api</span><span>SSH</span><span class="ok">在线</span></div>
+                        <div class="tui-tr"><span>测试-01</span><span>web</span><span>SSH</span><span class="warn">待检查</span></div>
+                        <div class="tui-tr"><span>本地-mac</span><span>demo</span><span>local</span><span class="tag">就绪</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>Enter</b> 查看详情<span class="sep">·</span><b>i</b> 巡检<span class="sep">·</span><b>r</b> 刷新<span class="sep">·</span><b>d</b> 部署<span class="sep">·</span><b>Esc/q</b> 返回</div>
+                    </div>
+                    <!-- 诊断 -->
+                    <div data-tui-panel="doctor" hidden>
+                      <div class="tui-crumb"><span>工具</span><span class="sep">›</span><span>环境诊断</span><span class="sep">›</span><span class="current">检查结果</span><span class="tui-focus">焦点: 内容</span></div>
+                      <div class="tui-title">环境诊断</div>
+                      <div class="tui-subrow"><span class="ok">12 通过</span><span class="warn">1 警告</span><span>0 失败</span><span style="margin-left:auto">退出码 0</span></div>
+                      <div class="tui-table tui-cols-doctor">
+                        <div class="tui-tr tui-tr--head"><span>检查项</span><span>结果</span><span>说明</span></div>
+                        <div class="tui-tr"><span>配置文件</span><span class="ok">通过</span><span class="dim">~/.local/share/ru/config.toml</span></div>
+                        <div class="tui-tr"><span>数据目录权限</span><span class="ok">通过</span><span class="dim">目录 0700 · 凭证独立存储</span></div>
+                        <div class="tui-tr"><span>Docker daemon</span><span class="ok">通过</span><span class="dim">Go SDK 直连 · 29.1.5</span></div>
+                        <div class="tui-tr is-selected"><span>回收站命令</span><span class="warn">警告</span><span class="dim">sidecar 未找到，将使用 PATH 中的 trash</span></div>
+                        <div class="tui-tr"><span>PostgreSQL 客户端</span><span class="ok">通过</span><span class="dim">随包 pg_dump 18.4</span></div>
+                        <div class="tui-tr"><span>计划任务</span><span class="ok">通过</span><span class="dim">launchd</span></div>
+                      </div>
+                      <div class="tui-empty-space"></div>
+                      <div class="tui-help"><b>↑↓</b> 滚动<span class="sep">·</span><b>r</b> 重新检查<span class="sep">·</span><b>Enter</b> 修复建议<span class="sep">·</span><b>Esc</b> 返回</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tui-help"><b>↑↓/j/k</b> 定位<span class="sep">·</span><b>Enter</b> 进入<span class="sep">·</span><b>/</b> 搜索<span class="sep">·</span><b>F4</b> 功能搜索<span class="sep">·</span><b>Tab</b> 焦点<span class="sep">·</span><b>Esc/q</b> 返回<span class="sep">·</span><b>r q</b> 导航栏<span class="sep">·</span><b>Ctrl+C</b> 退出</div>
+              </div>
+            </div>
+            <span class="float-chip float-chip--a"><span class="pulse"></span><b>Go SDK</b> 直连 Docker</span>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat__value"><span data-count="8">8</span><small>个</small></div>
+            <div class="stat__label">功能模块</div>
+          </div>
+          <div class="stat">
+            <div class="stat__value"><span data-count="52">52</span><small>篇</small></div>
+            <div class="stat__label">技术文档</div>
+          </div>
+          <div class="stat">
+            <div class="stat__value"><span data-count="4">4</span><small>种</small></div>
+            <div class="stat__label">运行环境</div>
+          </div>
+          <div class="stat">
+            <div class="stat__value"><span data-count="2">2</span><small>种</small></div>
+            <div class="stat__label">入口：TUI / CLI</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 模块 ===================== -->
+    <section class="section" id="modules">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>01</b> / 功能模块</span>
+            <h2 class="h2">一个入口，八种日常</h2>
+            <p class="section-lead">每个模块先是一个完整的 TUI 流程，再提供可脚本化的 CLI 入口。不用记命令，也不会在任务做到一半时忘记自己走到哪一步。</p>
+          </div>
+          <a class="section-link" href="docs.html#group-modules">模块文档</a>
+        </div>
+        <div class="module-grid">
+          <article class="module reveal">
+            <div class="module__top">
+              <span class="module__index">01</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>
+            </div>
+            <h3>Docker 管理</h3>
+            <p>镜像、容器、网络、磁盘、服务与离线安装。通过 Go SDK 直连 daemon，不依赖本机 docker CLI。</p>
+            <div class="module__foot"><span class="dot"></span>docker · 镜像批量导出 / 导入</div>
+          </article>
+          <article class="module reveal" data-delay="1">
+            <div class="module__top">
+              <span class="module__index">02</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path><path d="M10 11v5M14 11v5"></path></svg>
+            </div>
+            <h3>文件清理</h3>
+            <p>Maven、macOS 元数据、压缩包、临时文件与自定义规则清理；所有删除走废纸篓语义。</p>
+            <div class="module__foot"><span class="dot"></span>clean · 扫描后先确认再执行</div>
+          </article>
+          <article class="module reveal" data-delay="2">
+            <div class="module__top">
+              <span class="module__index">03</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg>
+            </div>
+            <h3>Find 文件查找</h3>
+            <p>TUI-only 的条件构建器、模板与历史记录；路径补全、近期候选与结果即时预览。</p>
+            <div class="module__foot"><span class="dot"></span>find · 条件组合 / 搜索结果</div>
+          </article>
+          <article class="module reveal" data-delay="3">
+            <div class="module__top">
+              <span class="module__index">04</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7" ry="3"></ellipse><path d="M5 5.6v6.4c0 1.7 3.1 3 7 3s7-1.3 7-3V5.6"></path><path d="M5 12v6.4c0 1.7 3.1 3 7 3s7-1.3 7-3V12"></path></svg>
+            </div>
+            <h3>数据库管理</h3>
+            <p>PostgreSQL 导入导出、全量备份、校验、Docker 恢复演练、保留策略、计划任务与用户权限。</p>
+            <div class="module__foot"><span class="dot"></span>database · 备份计划 / 权限</div>
+          </article>
+          <article class="module reveal">
+            <div class="module__top">
+              <span class="module__index">05</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15.5c0-4.7 3.5-8.5 8-10.5 1.8 4.9.8 9.4-2.5 12.5"></path><path d="M8 18.5c1.6 1.2 3.5 1.5 5.5.8 1.7-.6 3-1.8 3.8-3.3"></path><path d="M13 14c3.6-.2 6 1 7.2 3.5-2.3 2.4-5.1 3-8.2 1.8"></path><circle cx="10.8" cy="10.8" r="1.4"></circle></svg>
+            </div>
+            <h3>部署</h3>
+            <p>AIOps 远程部署与简单部署：配置检查、单实例/批量部署、远程初始化、状态巡检与交付包映射。</p>
+            <div class="module__foot"><span class="dot"></span>deploy · SSH / 本地目标</div>
+          </article>
+          <article class="module reveal" data-delay="1">
+            <div class="module__top">
+              <span class="module__index">06</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.9 7.9 7 10 4.1-2.1 7-5.5 7-10V6l-7-3Z"></path><path d="m9.2 11.8 2 2 3.6-3.8"></path></svg>
+            </div>
+            <h3>防火墙</h3>
+            <p>Linux UFW / firewalld / iptables 与 Windows Defender Firewall 的 TCP 入站规则管理，按环境显隐。</p>
+            <div class="module__foot"><span class="dot"></span>firewall · 仅展示可用平台</div>
+          </article>
+          <article class="module reveal" data-delay="2">
+            <div class="module__top">
+              <span class="module__index">07</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h12l-3-3M20 16H8l3 3"></path><path d="M4 8v4M20 16v-4"></path></svg>
+            </div>
+            <h3>文件中转</h3>
+            <p>把 root 可访问的文件或目录交付给普通登录用户；支持 Shell 别名注册、移动语义与目标冲突保护。</p>
+            <div class="module__foot"><span class="dot"></span>export · 原生 Linux</div>
+          </article>
+          <article class="module reveal" data-delay="3">
+            <div class="module__top">
+              <span class="module__index">08</span>
+              <svg class="module__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a3.5 3.5 0 0 0-4.7 4.3L4 16.6V20h3.4l5.8-5.8a3.5 3.5 0 0 0 4.3-4.7l-2.3 2.3-2.2-2.2 2.5-3.1Z"></path></svg>
+            </div>
+            <h3>工具与诊断</h3>
+            <p>随机密码生成、<code>ru doctor</code> 结构化环境诊断、安装与语义化版本 tag 管理。</p>
+            <div class="module__foot"><span class="dot"></span>tools · password / doctor / install</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 工作方式 ===================== -->
+    <section class="section section--soft" id="why">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>02</b> / 工作方式</span>
+            <h2 class="h2">为终端而做，也替脚本留好入口</h2>
+            <p class="section-lead">TUI 负责探索、确认与危险操作的把关，CLI 负责重复执行与 CI。两者共用同一套业务服务，界面只是外壳。</p>
+          </div>
+          <a class="section-link" href="docs.html#group-architecture">交互与架构</a>
+        </div>
+        <div class="bento">
+          <article class="cap cap--6 reveal">
+            <div class="cap__top">
+              <span class="cap__index">01 / 工作台</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"></rect><path d="M3 9h18M8 9v11"></path></svg>
+            </div>
+            <h3>全屏 TUI，状态不丢</h3>
+            <p>左侧模块、右侧工作区、底部帮助栏。面包屑记录流程节点，焦点与滚动由统一外壳管理，返回时回到同一流程的安全节点。</p>
+            <div class="cap__visual">
+              <div class="pane-mini">
+                <div class="pane"><div>[1] Docker</div><div>[2] 清理</div><div>[4] 数据库</div><div>[8] 工具</div></div>
+                <div class="pane"><div class="hl">Docker 管理 › 镜像列表</div><div>镜像名 &nbsp; 标签 &nbsp; 大小</div><div>nginx &nbsp; stable &nbsp; 187MB</div><div>redis &nbsp; 7.4 &nbsp; 41MB</div></div>
+              </div>
+            </div>
+          </article>
+          <article class="cap cap--6 reveal" data-delay="1">
+            <div class="cap__top">
+              <span class="cap__index">02 / 双入口</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"></rect><path d="m7 9 3 3-3 3M12.5 15h4.5"></path></svg>
+            </div>
+            <h3>TUI 与 CLI 共用一套服务</h3>
+            <p>界面负责确认与预览，子命令负责自动化。运维时看得见全貌，脚本里也能稳定拿到退出码与 JSON。</p>
+            <div class="cap__visual">
+              <div class="split-mini">
+                <span>ru</span><span class="arrow">→</span><span>全屏工作台</span><span class="arrow">↔</span><span>应用服务</span><span class="arrow">↔</span><span>ru docker / database / aiops</span>
+              </div>
+            </div>
+          </article>
+          <article class="cap cap--4 reveal">
+            <div class="cap__top">
+              <span class="cap__index">03 / 安全删除</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg>
+            </div>
+            <h3>危险操作有分寸</h3>
+            <p>不可恢复的删除需要连续两次 <span class="key-inline">d</span>，第一次只登记目标并展示影响范围；所有文件删除最终进入废纸篓。</p>
+            <div class="cap__visual">
+              <div class="split-mini"><span class="key-inline">d</span><span>待确认：目标与影响范围</span></div>
+              <div class="split-mini" style="margin-top:5px"><span class="key-inline">d</span><span class="arrow">→</span><span>执行</span><span>·</span><span>其他按键取消</span></div>
+            </div>
+          </article>
+          <article class="cap cap--4 reveal" data-delay="1">
+            <div class="cap__top">
+              <span class="cap__index">04 / 本地边界</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"></path><path d="M4 7.5 12 12l8-4.5M12 12v9"></path></svg>
+            </div>
+            <h3>配置与凭证留在本机</h3>
+            <p>配置与加密凭证存于当前用户的数据目录，密钥按模块隔离；Docker 通过 Go SDK 直连，不要求本机 docker CLI。</p>
+            <div class="cap__visual">
+              <div class="file-tree"><div><b>~/.local/share/ru</b></div><div>├─ config.toml</div><div>├─ credentials/<span>模块/密钥</span></div><div>└─ logs/ <span>按等级轮转</span></div></div>
+            </div>
+          </article>
+          <article class="cap cap--4 reveal" data-delay="2">
+            <div class="cap__top">
+              <span class="cap__index">05 / 平台门控</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.8 3.8 5.8 3.8 9s-1.3 6.2-3.8 9c-2.5-2.8-3.8-5.8-3.8-9S9.5 5.8 12 3Z"></path></svg>
+            </div>
+            <h3>能力跟着环境走</h3>
+            <p>防火墙、文件中转、Systemd 服务等能力按平台与权限显隐；禁用能力不会伪装成可用，开发入口只做预览。</p>
+            <div class="cap__visual">
+              <div class="plat-chips"><span>Linux</span><span>macOS</span><span>Windows</span><span>WSL</span><span>Linux + root</span></div>
+            </div>
+          </article>
+          <article class="cap cap--12 reveal">
+            <div class="cap__top">
+              <span class="cap__index">06 / 质量</span>
+              <svg class="cap__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l1 3h3v15H5V6h3l1-3Z"></path><path d="m8.5 13 2.4 2.4 4.6-4.8"></path></svg>
+            </div>
+            <h3>测试分层，未验证不冒充通过</h3>
+            <p>单元测试与质量守卫走 <code>make test</code>；真实 Docker、SSH 与防火墙环境通过显式开关启用。未设置开关的集成测试报告跳过，设置后缺参数或连接失败则直接失败。</p>
+            <div class="cap__visual">
+              <div class="test-lines">
+                <div><span class="ok">✓</span> go test ./... &nbsp; <span class="warn">·</span> 质量守卫</div>
+                <div><span class="warn">↷</span> RU_INTEGRATION_DOCKER=1 make test-integration &nbsp; <span class="warn">跳过真实环境</span></div>
+                <div><span class="warn">↷</span> RU_INTEGRATION_AIOPS=1 &nbsp; <span class="warn">未启用时跳过</span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 界面 ===================== -->
+    <section class="section" id="screens">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>03</b> / 真实界面</span>
+            <h2 class="h2">不是示意图，是每天打开的工作台</h2>
+            <p class="section-lead">下面是从终端单元格帧导出的真实 TUI 画面。表格、搜索、多选、确认页和帮助栏都在同一套公共组件里。</p>
+          </div>
+          <span class="chip" style="align-self:flex-end">终端单元格帧导出</span>
+        </div>
+        <div class="shots">
+          <button class="shot reveal" type="button" data-lightbox="assets/img/tui-docker.png" data-title="Docker · 镜像列表" data-caption="镜像列表、多选、排序与批量导出。删除镜像需要连续两次 d，第一次只进入待确认。">
+            <span class="shot__frame">
+              <img src="assets/img/tui-docker.png" alt="ru TUI 的 Docker 镜像列表界面，包含序号、镜像名、标签、大小、使用中与创建时间列" loading="lazy" decoding="async">
+              <span class="shot__zoom">⤢ 查看</span>
+            </span>
+            <span class="shot__meta"><b>Docker · 镜像列表</b><small>多选 / 排序 / 批量导出 / 双重确认删除</small></span>
+          </button>
+          <button class="shot reveal" data-delay="1" type="button" data-lightbox="assets/img/tui-deploy.png" data-title="简单部署 · 映射配置" data-caption="四列配置导入后按行配对制品、目标目录与容器；r i 导入映射，r e 导出空样例，r d 复制映射。">
+            <span class="shot__frame">
+              <img src="assets/img/tui-deploy.png" alt="ru TUI 的简单部署映射配置界面，包含制品、目标目录与容器列" loading="lazy" decoding="async">
+              <span class="shot__zoom">⤢ 查看</span>
+            </span>
+            <span class="shot__meta"><b>简单部署 · 映射配置</b><small>配置导入 / 一对一配对 / 样例导出</small></span>
+          </button>
+          <button class="shot reveal" data-delay="2" type="button" data-lightbox="assets/img/tui-form.png" data-title="参数表单 · 命令面板" data-caption="参数表单、字段说明与命令面板共用一个外壳；输入、下拉、确认与取消都按状态声明可用的按键。">
+            <span class="shot__frame">
+              <img src="assets/img/tui-form.png" alt="ru TUI 的参数表单和命令面板界面，包含字段、值、类型与字段说明" loading="lazy" decoding="async">
+              <span class="shot__zoom">⤢ 查看</span>
+            </span>
+            <span class="shot__meta"><b>参数表单 · 命令面板</b><small>字段说明 / 下拉选择 / F4 功能搜索</small></span>
+          </button>
+        </div>
+        <p class="shots-note">截图由仓库中的 TUI 预览帧渲染，使用演示数据；实际界面以当前构建版本为准。</p>
+      </div>
+    </section>
+
+    <!-- ===================== CLI ===================== -->
+    <section class="section section--soft" id="cli">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>04</b> / 命令行</span>
+            <h2 class="h2">批处理时，命令行就够了</h2>
+            <p class="section-lead">TUI 适合探索与确认，CLI 适合重复执行与放进脚本。下面是常用入口，完整参数以 <code>ru &lt;命令&gt; --help</code> 为准。</p>
+          </div>
+          <a class="section-link" href="doc.html?file=README.md" target="_blank" rel="noopener">CLI 速查</a>
+        </div>
+        <div class="cli-layout">
+          <div>
+            <div class="cli-tabs" role="tablist" aria-label="命令行分组">
+              <button class="cli-tab" type="button" role="tab" data-cli-tab="docker" aria-selected="true">Docker</button>
+              <button class="cli-tab" type="button" role="tab" data-cli-tab="backup" aria-selected="false">数据库</button>
+              <button class="cli-tab" type="button" role="tab" data-cli-tab="aiops" aria-selected="false">AIOps</button>
+              <button class="cli-tab" type="button" role="tab" data-cli-tab="doctor" aria-selected="false">诊断</button>
+              <button class="cli-tab" type="button" role="tab" data-cli-tab="tools" aria-selected="false">工具</button>
+            </div>
+            <div class="term-window cli-term">
+              <div class="term-bar">
+                <span class="win-dots"><i></i><i></i><i></i></span>
+                <span class="term-bar__title">zsh — ru</span>
+                <button class="copy-code" type="button" data-copy-cli>
+                  <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"></rect><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"></path></svg>
+                  复制
+                </button>
+              </div>
+              <div class="term-body">
+                <pre class="cli-code" data-cli-panel="docker"><span class="comment"># 查看镜像与磁盘占用</span>
+<span class="prompt">$</span> <span class="cmd">ru list</span>
+<span class="prompt">$</span> <span class="cmd">ru docker images-size</span>
+
+<span class="comment"># 批量保存与加载（压缩 / 并发）</span>
+<span class="prompt">$</span> <span class="cmd">ru save</span> <span class="flag">--all</span> <span class="flag">--compress gzip</span> <span class="flag">--output</span> ./images <span class="flag">--concurrency</span> 4
+<span class="prompt">$</span> <span class="cmd">ru load</span> <span class="flag">--input</span> ./images <span class="flag">--recurse</span> <span class="flag">--concurrency</span> 4
+
+<span class="comment"># 容器与资源概览</span>
+<span class="prompt">$</span> <span class="cmd">ru docker containers list</span>
+<span class="prompt">$</span> <span class="cmd">ru docker stats nginx</span></pre>
+                <pre class="cli-code" data-cli-panel="backup" hidden><span class="comment"># 备份计划与执行</span>
+<span class="prompt">$</span> <span class="cmd">ru database backup list</span>
+<span class="prompt">$</span> <span class="cmd">ru database backup run</span> <span class="flag">--plan</span> 生产库-每日全量
+
+<span class="comment"># 校验与隔离恢复演练</span>
+<span class="prompt">$</span> <span class="cmd">ru database backup verify</span> <span class="flag">--file</span> /backup/pg_20261103.dump
+<span class="prompt">$</span> <span class="cmd">ru database backup restore-test</span> <span class="flag">--file</span> /backup/pg_20261103.dump
+
+<span class="comment"># 系统计划任务</span>
+<span class="prompt">$</span> <span class="cmd">ru database backup schedule install</span> <span class="flag">--plan</span> 生产库-每日全量
+<span class="prompt">$</span> <span class="cmd">ru database backup schedule status</span> <span class="flag">--plan</span> 生产库-每日全量</pre>
+                <pre class="cli-code" data-cli-panel="aiops" hidden><span class="comment"># 服务器、配置与状态</span>
+<span class="prompt">$</span> <span class="cmd">ru aiops servers</span>
+<span class="prompt">$</span> <span class="cmd">ru aiops check-config</span>
+<span class="prompt">$</span> <span class="cmd">ru aiops status</span> <span class="flag">--server</span> 生产服务器
+<span class="prompt">$</span> <span class="cmd">ru aiops inspect</span> <span class="flag">--all</span>
+
+<span class="comment"># 单实例 / 批量部署</span>
+<span class="prompt">$</span> <span class="cmd">ru aiops deploy</span> <span class="flag">--server</span> 生产服务器 <span class="flag">--project</span> api <span class="flag">--local-path</span> ./target <span class="flag">--select</span> api.jar
+<span class="prompt">$</span> <span class="cmd">ru aiops multi-deploy</span> <span class="flag">--server</span> 生产服务器 <span class="flag">--project</span> api <span class="flag">--local-path</span> ./target <span class="flag">--select</span> api.jar</pre>
+                <pre class="cli-code" data-cli-panel="doctor" hidden><span class="comment"># 环境诊断：人读、机读、严格模式</span>
+<span class="prompt">$</span> <span class="cmd">ru doctor</span>
+<span class="prompt">$</span> <span class="cmd">ru doctor</span> <span class="flag">--json</span>
+<span class="prompt">$</span> <span class="cmd">ru doctor</span> <span class="flag">--strict</span>
+<span class="prompt">$</span> <span class="cmd">ru doctor</span> <span class="flag">--fix-plan</span>
+
+<span class="comment"># 输出检查项、结论与只读修复建议</span>
+<span class="out">config       ok     ~/.local/share/ru/config.toml</span>
+<span class="out">docker       ok     daemon reachable</span>
+<span class="out">trash        warn   sidecar not found; PATH fallback</span></pre>
+                <pre class="cli-code" data-cli-panel="tools" hidden><span class="comment"># 随机密码</span>
+<span class="prompt">$</span> <span class="cmd">ru tools password</span>
+<span class="prompt">$</span> <span class="cmd">ru tools password</span> <span class="flag">--format hex</span> <span class="flag">--bytes</span> 16
+<span class="prompt">$</span> <span class="cmd">ru tools password</span> <span class="flag">--format alnum</span> <span class="flag">--length</span> 24
+
+<span class="comment"># 自安装与版本 tag</span>
+<span class="prompt">$</span> <span class="cmd">ru install</span>
+<span class="prompt">$</span> <span class="cmd">ru git tag</span></pre>
+              </div>
+            </div>
+          </div>
+          <aside class="cli-notes">
+            <div class="note note--accent">
+              <div class="note__label">TUI-first</div>
+              <h3>危险操作先看见全貌</h3>
+              <p>选择镜像、确认路径、查看日志都在同一屏里；退出或切换页面不会把任务带去别的模块。</p>
+            </div>
+            <div class="note">
+              <div class="note__label">Exit code</div>
+              <h3>适合放进脚本和 CI</h3>
+              <p><code>ru doctor --json</code> 输出结构化结果，<code>--strict</code> 在需要时返回非零退出码，<code>--fix-plan</code> 只给建议不修改系统。</p>
+            </div>
+            <div class="note">
+              <div class="note__label">Keys</div>
+              <h3>帮助栏就是键盘文档</h3>
+              <p>底部帮助栏只显示当前状态真正可用的按键；输入、筛选和弹框打开时，单键动作自动让行。</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 安装 ===================== -->
+    <section class="section" id="install">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>05</b> / 安装</span>
+            <h2 class="h2">一行安装，先跑一遍诊断</h2>
+            <p class="section-lead">发布安装器自动识别系统与架构、校验 SHA-256 后执行包内安装；替换旧目标时按废纸篓语义处理。升级或离线环境也保留明确入口。</p>
+          </div>
+          <a class="section-link" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener">GitHub Releases</a>
+        </div>
+        <div class="install-grid">
+          <div>
+            <div class="install-tabs" role="tablist" aria-label="安装平台">
+              <button class="install-tab" type="button" role="tab" data-install-tab="unix" aria-selected="true">Linux / macOS</button>
+              <button class="install-tab" type="button" role="tab" data-install-tab="windows" aria-selected="false">Windows 10 / 11</button>
+            </div>
+            <div class="term-window">
+              <div class="term-bar">
+                <span class="win-dots"><i></i><i></i><i></i></span>
+                <span class="term-bar__title">install — ru</span>
+                <button class="copy-code" type="button" data-copy-install>
+                  <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"></rect><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"></path></svg>
+                  复制
+                </button>
+              </div>
+              <div class="term-body">
+                <pre class="install-command" data-install-panel="unix"><span class="prompt">$</span> curl -fsSL https://github.com/adddaao/utils-cli-releases/releases/latest/download/install.sh | sh</pre>
+                <pre class="install-command" data-install-panel="windows" hidden><span class="prompt">PS&gt;</span> powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072; irm 'https://github.com/adddaao/utils-cli-releases/releases/latest/download/install.ps1' | iex"</pre>
+              </div>
+            </div>
+            <p class="install-note">默认下载源为 <code>adddaao/utils-cli-releases</code>。自建 Gitea 或私有发布仓库时，安装前设置 <code>RU_RELEASE_BASE_URL</code>，必要时再用 <code>RU_VERSION</code> 固定版本。离线安装可把发布包与同名 <code>.sha256</code> 带至目标机后执行 <code>sh ./install.sh /path/to/ru-*.tar.gz</code>。<br>一键安装默认获取最新正式版（当前 <code>v0.2.6</code>）；若要与本页展示的预览线功能一致，请从 Releases 选择对应的 <code>v0.3.2 preview</code> 附件。</p>
+          </div>
+          <div class="install-side">
+            <ol class="checklist">
+              <li><b>安装并确认版本</b><br>运行 <code>ru version</code> 与 <code>ru --help</code>，确认命令入口已加入当前会话的 PATH。</li>
+              <li><b>运行环境诊断</b><br><code>ru doctor</code> 检查配置、权限、Docker、客户端与计划任务；需要机读结果时加 <code>--json</code>。</li>
+              <li><b>打开工作台</b><br>直接运行 <code>ru</code>，用 <span class="key-inline">↑</span> <span class="key-inline">↓</span> 选择模块，<span class="key-inline">Enter</span> 进入，<span class="key-inline">Ctrl+C</span> 退出。</li>
+            </ol>
+            <div class="callout">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 7.6v.4"></path></svg>
+              <span>Docker 模块需要可访问的 daemon；PostgreSQL 客户端随发布包提供。配置文件与凭证存放在当前用户的数据目录，不写入仓库。</span>
+            </div>
+            <div class="req-chips">
+              <span class="chip">Linux amd64 / arm64</span>
+              <span class="chip">macOS arm64</span>
+              <span class="chip">Windows 10 / 11</span>
+              <span class="chip">WSL</span>
+              <span class="chip">PowerShell 5.1+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 平台 ===================== -->
+    <section class="section section--soft" id="platform">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>06</b> / 平台</span>
+            <h2 class="h2">能力跟着环境走</h2>
+            <p class="section-lead">同一份代码在 Linux、macOS、Windows 与 WSL 上按能力显隐模块。不能用就是不能用，不会把不支持的入口伪装成可用。</p>
+          </div>
+          <a class="section-link" href="doc.html?file=platform-support.md" target="_blank" rel="noopener">平台支持文档</a>
+        </div>
+        <div class="matrix-wrap reveal">
+          <table class="matrix">
+            <thead>
+              <tr><th>能力</th><th>Linux</th><th>macOS</th><th>Windows</th><th>WSL</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>Docker 管理 / 镜像传输</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><th>文件清理 / Find 查找</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><th>PostgreSQL 备份 / 恢复演练</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="part">部分</td></tr>
+              <tr><th>防火墙管理</th><td class="yes">✓</td><td class="no">·</td><td class="yes">✓</td><td class="no">·</td></tr>
+              <tr><th>特权文件中转</th><td class="yes">✓</td><td class="no">·</td><td class="no">·</td><td class="no">·</td></tr>
+              <tr><th>AIOps 远程部署 / 巡检</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><th>回收站删除</th><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="matrix-note">“部分”表示功能存在平台边界：例如 WSL 不提供系统计划任务，数据库备份仍可手动执行；AIOps 本地目标仅支持 POSIX 用户态；Docker 相关能力需要 daemon 可访问，回收站删除依赖随包或 PATH 中的 <code>trash</code>。完整矩阵与门控方式见 <a href="doc.html?file=platform-support.md" target="_blank" rel="noopener">docs/platform-support.md</a>。</p>
+        <div class="build-chips">
+          <span>Linux amd64 / arm64</span><span>macOS arm64</span><span>Windows amd64</span><span>Go 1.26.10</span><span>单二进制发布</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 文档 ===================== -->
+    <section class="section" id="docs">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-head__main">
+            <span class="eyebrow"><b>07</b> / 文档</span>
+            <h2 class="h2">从架构契约到排错记录</h2>
+            <p class="section-lead">52 篇技术文档覆盖架构、TUI 交互、模块实现、配置、发布与质量审计。<code>docs/README.md</code> 是仓库正式文档的唯一入口。</p>
+          </div>
+          <a class="section-link" href="docs.html">打开文档地图</a>
+        </div>
+        <div class="doc-card-grid">
+          <a class="doc-card reveal" href="docs.html#group-architecture">
+            <span class="doc-card__top"><h3>架构与 TUI</h3><span class="doc-card__count">15 篇</span></span>
+            <p>分层架构、导航外壳、按键规范、公共组件、鼠标与渲染兼容。</p>
+            <span class="doc-card__link">维护者契约</span>
+          </a>
+          <a class="doc-card reveal" data-delay="1" href="docs.html#group-modules">
+            <span class="doc-card__top"><h3>模块、配置与平台</h3><span class="doc-card__count">24 篇</span></span>
+            <p>Docker、备份、部署、Find、防火墙和凭证存储的行为与边界。</p>
+            <span class="doc-card__link">模块手册</span>
+          </a>
+          <a class="doc-card reveal" data-delay="2" href="docs.html#group-release">
+            <span class="doc-card__top"><h3>发布、协作与迁移</h3><span class="doc-card__count">7 篇</span></span>
+            <p>构建产物、发布渠道、镜像、CI 与贡献流程。</p>
+            <span class="doc-card__link">发布与协作</span>
+          </a>
+          <a class="doc-card reveal" data-delay="3" href="docs.html#group-quality">
+            <span class="doc-card__top"><h3>质量记录与归档</h3><span class="doc-card__count">6 篇</span></span>
+            <p>按日期保留的审计、回归结论与历史资料索引。</p>
+            <span class="doc-card__link">审计记录</span>
+          </a>
+        </div>
+        <div class="docs-foot">
+          <span>文档源文件位于仓库 docs/，本站只做索引与导航。</span>
+          <a class="section-link" href="docs.html">浏览全部 52 篇 →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA ===================== -->
+    <section class="cta">
+      <div class="container cta__inner">
+        <div>
+          <span class="eyebrow"><b>START</b> / 开始使用</span>
+          <h2 style="margin-top:12px">把工作台装进你的机器。</h2>
+          <p>复制安装命令，跑一次 <code>ru doctor</code>，然后直接输入 <code>ru</code>。</p>
+          <div class="cta__cmd">
+            <code>curl -fsSL https://github.com/adddaao/utils-cli-releases/releases/latest/download/install.sh | sh</code>
+            <button class="copy-code" type="button" data-copy-text="curl -fsSL https://github.com/adddaao/utils-cli-releases/releases/latest/download/install.sh | sh">复制</button>
+          </div>
+        </div>
+        <div class="cta__actions">
+          <a class="btn btn--invert" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener">下载最新版本</a>
+          <a class="btn btn--outline" href="docs.html">阅读文档</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== 页脚 ===================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="ru 展示站首页">
+            <img class="brand__mark" src="assets/img/favicon.svg" alt="" width="24" height="24">
+            <span class="brand__word">ru</span>
+            <span class="brand__tag">utils-cli</span>
+          </a>
+          <p>面向开发与运维的本地系统管理工作台。全屏 TUI 与可脚本化的子命令共用一套业务服务，把 Docker、备份、部署、防火墙与清理放进终端。</p>
+          <div class="hero-meta" style="margin-top:2px"><span class="chip">v0.3.2 preview</span><span class="chip">正式版 v0.2.6</span></div>
+        </div>
+        <div class="footer-col">
+          <h4>产品</h4>
+          <ul>
+            <li><a href="#modules">功能模块</a></li>
+            <li><a href="#screens">界面截图</a></li>
+            <li><a href="#cli">命令行</a></li>
+            <li><a href="#install">安装</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>文档</h4>
+          <ul>
+            <li><a href="docs.html">文档地图</a></li>
+            <li><a href="doc.html?file=architecture.md" target="_blank" rel="noopener">总体架构</a></li>
+            <li><a href="doc.html?file=platform-support.md" target="_blank" rel="noopener">平台支持</a></li>
+            <li><a href="doc.html?file=tui-keybindings.md" target="_blank" rel="noopener">按键规范</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>项目</h4>
+          <ul>
+            <li><a href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener">GitHub Releases</a></li>
+            <li><a href="doc.html?file=release-workflow.md" target="_blank" rel="noopener">发布流程</a></li>
+            <li><a href="doc.html?file=CONTRIBUTING.md" target="_blank" rel="noopener">贡献指南</a></li>
+            <li><a href="doc.html?file=MIGRATION.md" target="_blank" rel="noopener">迁移说明</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>关于</h4>
+          <ul>
+            <li><a href="doc.html?file=config.md" target="_blank" rel="noopener">配置说明</a></li>
+            <li><a href="doc.html?file=logging.md" target="_blank" rel="noopener">日志规范</a></li>
+            <li><a href="docs.html#group-quality" target="_blank" rel="noopener">质量记录</a></li>
+            <li><a href="doc.html?file=README.md" target="_blank" rel="noopener">文档索引</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 utils-cli · ru。本页是仓库展示站，内容依据 README.md 与 docs/ 整理，不替代发布说明；展示功能以主分支文档为准。</span>
+        <span class="footer-keys"><span>⌘K 搜索</span><span>·</span><span>t 明暗</span><span>·</span><span>Esc 关闭</span></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== 命令面板 ===================== -->
+  <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="搜索站内内容" hidden>
+    <div class="palette-box">
+      <div class="palette-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path></svg>
+        <input id="paletteInput" type="text" placeholder="搜索模块、文档或界面…" autocomplete="off" spellcheck="false" aria-controls="paletteResults" aria-autocomplete="list">
+        <kbd class="kbd">Esc</kbd>
+      </div>
+      <div class="palette-results" id="paletteResults" role="listbox" aria-label="搜索结果"></div>
+      <div class="palette-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+        <span><kbd>Enter</kbd> 打开</span>
+        <span><kbd>Esc</kbd> 关闭</span>
+        <span style="margin-left:auto">ru · 52 篇文档</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 截图查看器 ===================== -->
+  <dialog class="lightbox" id="lightbox" aria-label="截图查看">
+    <div class="lightbox__bar"><span id="lightboxTitle">TUI 截图</span><button class="lightbox__close" type="button" id="lightboxClose">Esc 关闭</button></div>
+    <img id="lightboxImage" src="" alt="">
+    <div class="lightbox__caption" id="lightboxCaption"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</body>
+</html>

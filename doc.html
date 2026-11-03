@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文档阅读 · ru（utils-cli）</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#06070a">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/ibm-plex-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      try {
+        var saved = localStorage.getItem('ru-showcase:theme');
+        root.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+      } catch (e) {
+        root.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body data-page="reader">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="ru 展示站首页">
+        <img class="brand__mark" src="assets/img/favicon.svg" alt="" width="27" height="27">
+        <span class="brand__word">ru</span>
+        <span class="brand__tag">utils-cli</span>
+        <span class="brand__ver">v0.3.2 preview</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="index.html#modules">模块</a>
+        <a href="index.html#screens">界面</a>
+        <a href="index.html#cli">命令</a>
+        <a class="is-active" href="docs.html" aria-current="page">文档</a>
+        <a href="index.html#install">安装</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" type="button" data-open-palette aria-label="搜索站内内容">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path></svg>
+          <span>搜索</span>
+          <kbd>⌘K</kbd>
+        </button>
+        <button class="icon-btn" type="button" id="themeToggle" aria-label="切换深浅色" title="切换深浅色">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.2A8.4 8.4 0 0 1 9.8 3.6 8.5 8.5 0 1 0 20.4 14.2Z"></path></svg>
+        </button>
+        <a class="icon-btn" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener noreferrer" aria-label="GitHub Releases" title="GitHub Releases">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.36-3.36-1.36-.45-1.18-1.1-1.49-1.1-1.49-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.88 1.54 2.3 1.1 2.86.84.09-.65.35-1.1.63-1.35-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.7.12 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.93.68 1.87v2.77c0 .26.18.58.69.48A10.02 10.02 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z"></path></svg>
+        </a>
+        <button class="icon-btn nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="mobilePanel" aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-panel" id="mobilePanel" aria-label="移动端菜单">
+    <div class="mobile-panel__links">
+      <a href="index.html">首页</a>
+      <a href="index.html#modules">功能模块</a>
+      <a href="index.html#screens">界面截图</a>
+      <a href="index.html#cli">命令行</a>
+      <a href="docs.html">技术文档</a>
+      <a href="index.html#install">安装</a>
+    </div>
+    <div class="mobile-panel__actions">
+      <a class="btn btn--sm" href="docs.html">返回文档地图</a>
+      <a class="btn btn--sm btn--ghost" href="https://github.com/adddaao/utils-cli-releases/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>
+    </div>
+    <p class="mobile-panel__help">快捷键：⌘K / Ctrl+K 搜索，t 切换明暗，Esc 关闭浮层。</p>
+  </div>
+
+  <main id="main">
+    <div class="container reader">
+      <div class="crumbs"><a href="index.html">首页</a><span class="sep">/</span><a href="docs.html">文档</a><span class="sep">/</span><span id="readerCrumb">Markdown</span></div>
+      <div class="reader-head">
+        <div>
+          <h1 id="readerTitle">加载文档…</h1>
+          <div class="reader-meta"><span id="readerPath">docs/…</span><span>·</span><span>UTF-8 Markdown 原文</span></div>
+        </div>
+        <div class="reader-actions">
+          <a class="btn btn--sm btn--ghost" href="docs.html">返回文档地图</a>
+          <a class="btn btn--sm" id="readerRaw" href="#" download>下载 Markdown</a>
+        </div>
+      </div>
+      <div class="reader-body">
+        <pre id="readerContent" tabindex="0">正在读取 Markdown 原文…</pre>
+      </div>
+      <p class="reader-note">这里是浏览器读取到的 Markdown 源文，按 UTF-8 解码并以等宽文本显示。需要渲染后的排版时，请在仓库中阅读；文档索引见 <a href="docs.html">技术文档</a>。</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>© 2026 utils-cli · ru。本页读取仓库 docs/ 下的 Markdown 原文，不复制、不改写内容。</span>
+        <span class="footer-keys"><a href="docs.html">文档地图</a><span>·</span><a href="index.html">返回首页</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="搜索站内内容" hidden>
+    <div class="palette-box">
+      <div class="palette-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path></svg>
+        <input id="paletteInput" type="text" placeholder="搜索模块、文档或界面…" autocomplete="off" spellcheck="false" aria-controls="paletteResults" aria-autocomplete="list">
+        <kbd class="kbd">Esc</kbd>
+      </div>
+      <div class="palette-results" id="paletteResults" role="listbox" aria-label="搜索结果"></div>
+      <div class="palette-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+        <span><kbd>Enter</kbd> 打开</span>
+        <span><kbd>Esc</kbd> 关闭</span>
+        <span style="margin-left:auto">ru · 52 篇文档</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</body>
+</html>
