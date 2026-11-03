@@ -3159,6 +3159,33 @@ html[data-theme="light"] .icon-btn .icon-moon {
   overflow-wrap: normal;
 }
 
+/* 含制表符的框图：统一使用带制表符的等宽字体，ASCII 与边框同宽 */
+.doc-prose .doc-code--grid pre {
+  font-family: Menlo, Monaco, "DejaVu Sans Mono", "Liberation Mono", monospace;
+}
+
+/* 制表符固定为一格，避免字体步进差异让边框逐行漂移 */
+.doc-prose .doc-code .doc-cell--grid {
+  display: inline-block;
+  width: 1ch;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: center;
+  white-space: pre;
+  vertical-align: baseline;
+}
+
+/* ASCII 图里的中文按终端习惯占两格，保证框图边框对齐 */
+.doc-prose .doc-code .doc-cell--wide {
+  display: inline-block;
+  width: 2ch;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: center;
+  white-space: pre;
+  vertical-align: baseline;
+}
+
 /* Markdown 源码视图 */
 .reader-body > pre {
   margin: 0;

@@ -61,14 +61,33 @@
       '" aria-hidden="true" tabindex="-1">#</a>';
   }
 
+  /* 终端/ASCII 图按“CJK 占两格”排版；浏览器里中文只有约 1.7 格，
+     这里把宽字符撑成 2ch，避免架构图、表格线错位 */
+  var WIDE_CHAR = /[\u{1100}-\u{115F}\u{2E80}-\u{303E}\u{3041}-\u{33FF}\u{3400}-\u{4DBF}\u{4E00}-\u{9FFF}\u{A000}-\u{A4CF}\u{A960}-\u{A97F}\u{AC00}-\u{D7A3}\u{F900}-\u{FAFF}\u{FE10}-\u{FE19}\u{FE30}-\u{FE6F}\u{FF00}-\u{FF60}\u{FFE0}-\u{FFE6}\u{1F300}-\u{1F64F}\u{1F900}-\u{1F9FF}\u{20000}-\u{3FFFD}]/gu;
+
+  /* 含制表符的图块（编辑器/终端里的框图）单独换用带完整制表符的等宽字体，
+     避免 IBM Plex Mono 缺字时回退字体宽度不一致导致边框逐行漂移 */
+  var GRID_CHAR = /[─━│┃┌┏┐┓└┗┘┛├┣┤┫┬┳┴┻┼╋═║╔╗╚╝╠╣╦╩╬▼▲◀▶]/g;
+  var GRID_TEST = /[─━│┃┌┏┐┓└┗┘┛├┣┤┫┬┳┴┻┼╋═║╔╗╚╝╠╣╦╩╬▼▲◀▶]/;
+  var GRID_FONT_CLASS = ' doc-code--grid';
+
   function codeBlock(token) {
     var lang = String(token.lang || '').trim().split(/\s+/)[0] || '';
-    var body = escapeHtml(String(token.text || '').replace(/\n$/, ''));
+    var raw = String(token.text || '').replace(/\n$/, '');
+    var body = escapeHtml(raw);
+    body = body.replace(WIDE_CHAR, function (ch) {
+      return '<span class="doc-cell--wide">' + ch + '</span>';
+    });
+    /* 制表符在不同字体里的步进可能与 ASCII 略有差异，固定成 1ch 才能逐列对齐 */
+    body = body.replace(GRID_CHAR, function (ch) {
+      return '<span class="doc-cell--grid">' + ch + '</span>';
+    });
     var langLabel = lang
       ? '<span class="doc-code__lang">' + escapeHtml(lang) + '</span>'
       : '<span class="doc-code__lang doc-code__lang--plain">代码</span>';
     /* 缩进代码块没有围栏，单独标记便于测试与样式区分 */
     var kind = token.lang === undefined ? ' doc-code--indented' : '';
+    if (GRID_TEST.test(raw)) kind += GRID_FONT_CLASS;
     return '<figure class="doc-code' + kind + '">' +
       '<figcaption class="doc-code__head">' + langLabel +
       '<button class="doc-code__copy" type="button" data-copy-code aria-label="复制代码">复制</button>' +

@@ -71,9 +71,12 @@ node --test showcase/tests/markdown.test.mjs
 ```bash
 # 需要已通过 gh 登录 adddaao 账号（repo 权限）
 ./showcase/publish-gh-pages.sh
+
+# 同时把改动过的公开文档同步到线上快照（只允许 data.js 里已索引的文档）
+./showcase/publish-gh-pages.sh "docs: 修正架构图对齐" architecture.md
 ```
 
-脚本会克隆 `adddaao/utils-cli-releases` 的 `gh-pages` 分支到临时目录，只同步站点自身文件（`index.html`、`docs.html`、`doc.html`、`preview.jpg`、`README.md`、`assets/`），保留线上已有的 `docs/` 快照、`.nojekyll` 与 `.gitignore`；随后把 `doc.html` 的 `data-docs-base` 从 `../docs/` 改写为 `docs/`，提交并推送。临时目录用 `trash` 回收。
+脚本会克隆 `adddaao/utils-cli-releases` 的 `gh-pages` 分支到临时目录，只同步站点自身文件（`index.html`、`docs.html`、`doc.html`、`preview.jpg`、`README.md`、`assets/`），保留线上已有的 `docs/` 快照、`.nojekyll` 与 `.gitignore`；随后把 `doc.html` 的 `data-docs-base` 从 `../docs/` 改写为 `docs/`，按参数复制指定文档到线上 `docs/`，校验索引内 52 篇文档都存在，提交并推送。临时目录用 `trash` 回收。
 
 ## 维护提示
 
